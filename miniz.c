@@ -209,8 +209,12 @@
 #define MINIZ_LITTLE_ENDIAN 1
 #endif
 
-#if MINIZ_X86_OR_X64_CPU
+#if MINIZ_X86_OR_X64_CPU && !defined(MINIZ_USE_UNALIGNED_LOADS_AND_STORES)
 // Set MINIZ_USE_UNALIGNED_LOADS_AND_STORES to 1 on CPU's that permit efficient integer loads and stores from unaligned addresses.
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
 #define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 1
 #endif
 
@@ -4887,6 +4891,12 @@ void *mz_zip_extract_archive_file_to_heap(const char *pZip_filename, const char 
 #endif
 
 #endif // MINIZ_HEADER_FILE_ONLY
+
+
+#if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
 
 /*
   This is free and unencumbered software released into the public domain.
